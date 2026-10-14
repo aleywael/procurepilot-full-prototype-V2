@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProcurePilot</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">PP</div>
+      <div>
+        <div class="brand-title">ProcurePilot</div>
+        <div class="brand-sub">Procurement Decision Intelligence</div>
+      </div>
+    </div>
+
+    <nav id="sideNav">
+      <button class="nav active" data-page="overview">Overview</button>
+      <button class="nav" data-page="dashboard">Dashboard</button>
+      <button class="nav" data-page="import">Import & Readiness</button>
+      <button class="nav" data-page="issues">Priority Issues</button>
+      <button class="nav" data-page="risk">Predictive Risk</button>
+      <button class="nav" data-page="suppliers">Suppliers</button>
+      <button class="nav" data-page="scenario">What-if Simulator</button>
+      <button class="nav" data-page="copilot">AI Copilot</button>
+      <button class="nav" data-page="decisions">Decisions & Outcomes</button>
+      <button class="nav" data-page="builder">Dashboard Builder</button>
+      <button class="nav" data-page="admin">Admin & Audit</button>
+    </nav>
+
+    <div class="side-footer">
+      Prototype mode<br>
+      <span>AI advises. Human decides.</span>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Overview</h1>
+        <p id="pageSubtitle">What needs attention, what may happen next, and what decisions need review.</p>
+      </div>
+      <div class="top-actions">
+        <span class="badge" id="datasetBadge">Loading…</span>
+        <button class="btn ghost" id="resetDemo">Reset demo</button>
+      </div>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="page active" id="page-overview">
+      <div id="overviewKpis" class="kpi-grid"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">Analysis readiness</div>
+          <div class="sub">Is each analysis trustworthy enough to use?</div>
+          <div id="readinessMini" class="stack top"></div>
+        </div>
+
+        <div class="card">
+          <div class="title">What changed since last upload</div>
+          <div class="sub">New, persistent, improving and resolved issues.</div>
+          <div id="changeSummary" class="change-grid top"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row between wrap">
+          <div>
+            <div class="title">Priority exception inbox</div>
+            <div class="sub">What should the employee investigate first?</div>
+          </div>
+          <button class="btn" id="openTopIssue">Open top issue</button>
+        </div>
+        <div id="overviewIssues" class="stack top"></div>
+      </div>
+
+      <div class="card">
+        <div class="row between wrap">
+          <div>
+            <div class="title">Decision reviews</div>
+            <div class="sub">Previous decisions due for outcome review.</div>
+          </div>
+          <button class="btn ghost" data-go="decisions">View decisions</button>
+        </div>
+        <div id="overviewDecisions" class="stack top"></div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="page" id="page-dashboard">
+      <div class="card">
+        <div class="row between wrap">
+          <div>
+            <div class="title">Interactive Procurement Dashboard</div>
+            <div class="sub">Analyze procurement performance visually after the data is cleaned and validated.</div>
+          </div>
+          <button class="btn ghost" data-go="builder">Customize dashboard</button>
+        </div>
+
+        <div class="filters top">
+          <label>Supplier
+            <select id="filterSupplier"><option value="ALL">All suppliers</option></select>
+          </label>
+          <label>Category
+            <select id="filterCategory"><option value="ALL">All categories</option></select>
+          </label>
+          <label>Status
+            <select id="filterStatus">
+              <option value="ALL">All status</option>
+              <option value="CLOSED">Closed</option>
+              <option value="OPEN">Open</option>
+            </select>
+          </label>
+          <button class="btn ghost" id="clearFilters">Clear filters</button>
+        </div>
+      </div>
+
+      <div id="dashboardKpis" class="kpi-grid"></div>
+      <div id="dashboardCharts" class="chart-grid"></div>
+    </section>
+
+    <!-- IMPORT -->
+    <section class="page" id="page-import">
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">Upload procurement data</div>
+          <div class="sub">File-first workflow for CSV exports from SAP/ERP.</div>
+
+          <label class="upload">
+            <input id="fileInput" type="file" accept=".csv">
+            <strong>Choose CSV file</strong>
+            <span>Upload a new procurement export to refresh the analysis.</span>
+          </label>
+
+          <div class="row wrap top">
+            <button class="btn" id="loadBaseline">Load sample baseline</button>
+            <button class="btn ghost" id="loadFollowup">Load sample follow-up</button>
+          </div>
+          <div id="importStatus" class="notice top">Baseline dataset will load automatically.</div>
+        </div>
+
+        <div class="card">
+          <div class="title">Smart field mapping</div>
+          <div class="sub">Rules first; AI can suggest uncertain mappings.</div>
+          <div id="mappingPreview" class="top"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="title">Data cleaning & validation</div>
+        <div id="qualityGrid" class="quality-grid top"></div>
+      </div>
+
+      <div class="card">
+        <div class="title">KPI-specific Analysis Readiness</div>
+        <div class="sub">Ready, Use with Caution, or Not Ready — with the reason shown.</div>
+        <div id="readinessFull" class="stack top"></div>
+      </div>
+    </section>
+
+    <!-- ISSUES -->
+    <section class="page" id="page-issues">
+      <div class="card">
+        <div class="title">Priority Issues</div>
+        <div class="sub">Ranked by severity, exposure and future risk.</div>
+        <div id="issuesList" class="stack top"></div>
+      </div>
+
+      <div class="card">
+        <div class="row between wrap">
+          <div>
+            <div class="title">Evidence Packet</div>
+            <div class="sub" id="evidenceSubtitle">Select an issue to inspect the exact evidence.</div>
+          </div>
+          <span class="badge" id="evidenceSeverity">—</span>
+        </div>
+        <div id="evidenceBody" class="empty top">No issue selected.</div>
+      </div>
+    </section>
+
+    <!-- RISK -->
+    <section class="page" id="page-risk">
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">Predictive Supplier / PO Risk</div>
+          <div class="sub">Estimate which suppliers are most likely to create future delivery problems.</div>
+          <div id="riskList" class="stack top"></div>
+        </div>
+
+        <div class="card">
+          <div class="title">Explainable Prediction</div>
+          <div class="sub">Why is the model producing this risk?</div>
+          <div id="riskExplain" class="empty top">Select a supplier.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="title">Decision Reliability Score</div>
+        <div class="sub">How much should the employee trust the recommendation?</div>
+        <div id="reliabilityBox" class="top"></div>
+      </div>
+    </section>
+
+    <!-- SUPPLIERS -->
+    <section class="page" id="page-suppliers">
+      <div class="card">
+        <div class="row between wrap">
+          <div>
+            <div class="title">Supplier Performance & Comparison</div>
+            <div class="sub">Compare delivery, quality, spend, exposure and predictive risk.</div>
+          </div>
+          <select id="supplierSort">
+            <option value="risk">Sort by predicted risk</option>
+            <option value="otd">Sort by OTD</option>
+            <option value="spend">Sort by spend</option>
+          </select>
+        </div>
+        <div class="table-wrap top">
+          <table>
+            <thead><tr><th>Supplier</th><th>OTD</th><th>Avg delay</th><th>Quality</th><th>Spend</th><th>Overdue</th><th>Predicted risk</th></tr></thead>
+            <tbody id="supplierTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENARIO -->
+    <section class="page" id="page-scenario">
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">What-if Supplier Allocation Simulator</div>
+          <div class="sub">Test a possible sourcing decision before acting.</div>
+          <label class="field">Move volume from
+            <select id="scenarioFrom"></select>
+          </label>
+          <label class="field">Move volume to
+            <select id="scenarioTo"></select>
+          </label>
+          <label class="field">Volume shift <strong id="shareLabel">20%</strong>
+            <input id="shareRange" type="range" min="0" max="50" value="20" step="5">
+          </label>
+          <button class="btn top" id="runScenario">Run scenario</button>
+          <div class="notice top">Scenario outputs are historical estimates, not guaranteed predictions.</div>
+        </div>
+
+        <div class="card">
+          <div class="title">Scenario Result</div>
+          <div id="scenarioOutput" class="top"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COPILOT -->
+    <section class="page" id="page-copilot">
+      <div class="grid-2">
+        <div class="card chat-card">
+          <div class="title">Procurement AI Copilot</div>
+          <div class="sub">Ask natural-language questions using verified ProcurePilot evidence.</div>
+          <div id="chatMessages" class="chat top"></div>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" placeholder="Ask about suppliers, risk, POs or decisions…">
+            <button class="btn" type="submit">Ask</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="title">Suggested questions</div>
+          <div class="quick top">
+            <button>Which supplier has the worst OTD?</button>
+            <button>Which supplier should I investigate first?</button>
+            <button>Why is Gamma Metals high risk?</button>
+            <button>What should I do about Gamma Metals?</button>
+            <button>Compare Gamma Metals and Beta Industrial.</button>
+            <button>Why exactly did Gamma Metals deliver late?</button>
+          </div>
+
+          <div class="notice top">
+            <strong>AI boundary:</strong> ProcurePilot may explain verified evidence and suggest actions, but it must not invent KPI values, claim unsupported root causes, approve POs or change supplier allocation automatically.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DECISIONS -->
+    <section class="page" id="page-decisions">
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">Decision Journal</div>
+
+          <label class="field">Issue
+            <select id="decisionIssue"></select>
+          </label>
+          <label class="field">Owner
+            <input id="decisionOwner" value="Procurement Analyst">
+          </label>
+          <label class="field">Decision
+            <textarea id="decisionText" rows="4" placeholder="What action will be taken?"></textarea>
+          </label>
+          <label class="field">Rationale
+            <textarea id="decisionRationale" rows="3" placeholder="Why, based on the evidence?"></textarea>
+          </label>
+
+          <div class="grid-2 compact">
+            <label class="field">Target KPI
+              <select id="decisionKpi">
+                <option value="OTD">OTD</option>
+                <option value="Overdue">Overdue open POs</option>
+                <option value="Quality">Quality rejection</option>
+              </select>
+            </label>
+            <label class="field">Target value
+              <input id="decisionTarget" type="number" value="82">
+            </label>
+          </div>
+
+          <label class="field">Review date
+            <input id="decisionDate" type="date">
+          </label>
+
+          <button class="btn top" id="saveDecision">Save human decision</button>
+          <div id="decisionStatus" class="notice top">AI can advise. The employee makes the final decision.</div>
+        </div>
+
+        <div class="card">
+          <div class="title">Decision History & Outcome Tracking</div>
+          <div id="decisionHistory" class="stack top"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="title">Decision Memory Matching</div>
+        <div class="sub">Reuse organizational learning from similar previous cases.</div>
+        <div id="decisionMemory" class="stack top"></div>
+      </div>
+    </section>
+
+    <!-- BUILDER -->
+    <section class="page" id="page-builder">
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">Personalized Dashboard Builder</div>
+          <div class="sub">Choose which dashboard visuals and KPI cards you want to see.</div>
+          <div id="builderOptions" class="check-list top"></div>
+          <button class="btn top" id="applyDashboard">Apply dashboard selection</button>
+          <div class="notice top">Critical alerts remain accessible in Overview and Priority Issues even if a dashboard visual is hidden.</div>
+        </div>
+
+        <div class="card">
+          <div class="title">Role presets</div>
+          <div class="stack top">
+            <button class="preset" data-preset="analyst"><strong>Procurement Analyst</strong><span>Operational KPIs, delivery, price, quality and risk.</span></button>
+            <button class="preset" data-preset="manager"><strong>Procurement Manager</strong><span>Spend, supplier risk, concentration and major trends.</span></button>
+            <button class="preset" data-preset="quality"><strong>Quality-focused</strong><span>Supplier quality, OTD, risk and exception trends.</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="page" id="page-admin">
+      <div class="grid-2">
+        <div class="card">
+          <div class="title">Rules & Thresholds</div>
+          <div class="rules top">
+            <div><span>Supplier OTD alert</span><strong>&lt; 80%</strong></div>
+            <div><span>High predictive risk</span><strong>≥ 65%</strong></div>
+            <div><span>Quality rejection alert</span><strong>&gt; 5%</strong></div>
+            <div><span>OTD deterioration alert</span><strong>&gt; 15 pts</strong></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="title">Audit Log</div>
+          <div id="auditLog" class="stack top"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
